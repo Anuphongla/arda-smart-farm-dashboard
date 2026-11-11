@@ -1,217 +1,426 @@
 import { Station, WeatherData, HandyDevice, SoilData } from "@/types/arda";
 
+// Real station list snapshot from https://weather-api.arda365days.com/api/public/v1/stations
 export const mockStations: Station[] = [
   {
-    id: "ST-CM01",
-    name: "สถานีวิจัยเกษตรหลวงเชียงใหม่ (ดอยอ่างขาง)",
-    station_code: "AGRI-CM-01",
-    province: "เชียงใหม่",
-    amphoe: "ฝาง",
-    tambon: "แม่งอน",
-    lat: 19.9012,
-    lng: 99.0435,
+    id: "ST0007",
+    name: "อบต. หนองไผ่",
+    station_code: "ST0007",
+    province: "มหาสารคาม",
+    amphoe: "กุดรัง",
+    tambon: "หนองไผ่",
+    lat: 16.12753,
+    lng: 102.2787,
     status: "online",
     last_seen: new Date().toISOString(),
   },
   {
-    id: "ST-SP02",
-    name: "สถานีแปลงนาทดลองสุพรรณบุรี (นาข้าวอินทรีย์)",
-    station_code: "AGRI-SP-02",
-    province: "สุพรรณบุรี",
-    amphoe: "ดอนเจดีย์",
-    tambon: "สระกระโจม",
-    lat: 14.6543,
-    lng: 100.0211,
+    id: "ST0017",
+    name: "อบต. กำพี้",
+    station_code: "ST0017",
+    province: "มหาสารคาม",
+    amphoe: "บรบือ",
+    tambon: "กำพี้",
+    lat: 15.963985,
+    lng: 103.156137,
     status: "online",
     last_seen: new Date().toISOString(),
   },
   {
-    id: "ST-RY03",
-    name: "สถานีวิจัยไม้ผลภาคตะวันออก ระยอง",
-    station_code: "AGRI-RY-03",
-    province: "ระยอง",
-    amphoe: "แกลง",
-    tambon: "ทางเกวียน",
-    lat: 12.7821,
-    lng: 101.6542,
+    id: "ST0014",
+    name: "SC3 คณะวิทยาศาสตร์ มมส.",
+    station_code: "ST0014",
+    province: "มหาสารคาม",
+    amphoe: "กันทรวิชัย",
+    tambon: "ขามเรียง",
+    lat: 16.249118,
+    lng: 103.250281,
     status: "online",
     last_seen: new Date().toISOString(),
   },
   {
-    id: "ST-KR04",
-    name: "สถานีเกษตรพืชไร่แปลงใหญ่ นครราชสีมา",
-    station_code: "AGRI-KR-04",
-    province: "นครราชสีมา",
-    amphoe: "ปากช่อง",
-    tambon: "หมูสี",
-    lat: 14.5821,
-    lng: 101.4231,
+    id: "ST0010",
+    name: "ฟาร์มมหาลัยมหาสารคาม ต.นาสีนวล",
+    station_code: "ST0010",
+    province: "มหาสารคาม",
+    amphoe: "กันทรวิชัย",
+    tambon: "นาสีนวล",
+    lat: 16.3462,
+    lng: 103.2059,
+    status: "online",
+    last_seen: new Date().toISOString(),
+  },
+  {
+    id: "ST0018",
+    name: "อบต.เขวาไร่ อ.นาเชือก",
+    station_code: "ST0018",
+    province: "มหาสารคาม",
+    amphoe: "นาเชือก",
+    tambon: "เขวาไร่",
+    lat: 15.833409,
+    lng: 103.049777,
+    status: "online",
+    last_seen: new Date().toISOString(),
+  },
+  {
+    id: "ST0019",
+    name: "อบต.นาภู",
+    station_code: "ST0019",
+    province: "มหาสารคาม",
+    amphoe: "ยางสีสุราช",
+    tambon: "นาภู",
+    lat: 15.677759,
+    lng: 103.047124,
+    status: "online",
+    last_seen: new Date().toISOString(),
+  },
+  {
+    id: "ST0012",
+    name: "อบต.แห่ใต้",
+    station_code: "ST0012",
+    province: "มหาสารคาม",
+    amphoe: "โกสุมพิสัย",
+    tambon: "แห่ใต้",
+    lat: 16.294949,
+    lng: 103.124278,
+    status: "online",
+    last_seen: new Date().toISOString(),
+  },
+  {
+    id: "ST0013",
+    name: "อบต.ดอนเงิน",
+    station_code: "ST0013",
+    province: "มหาสารคาม",
+    amphoe: "เชียงยืน",
+    tambon: "ดอนเงิน",
+    lat: 16.421971,
+    lng: 103.16106,
+    status: "online",
+    last_seen: new Date().toISOString(),
+  },
+  {
+    id: "ST0020",
+    name: "อบต.เสือโก้ก",
+    station_code: "ST0020",
+    province: "มหาสารคาม",
+    amphoe: "วาปีปทุม",
+    tambon: "เสือโก้ก",
+    lat: 15.939527,
+    lng: 103.444875,
+    status: "online",
+    last_seen: new Date().toISOString(),
+  },
+  {
+    id: "ST0009",
+    name: "กลุ่มปลูกข้าวบ้านเก่าน้อย ต.หนองบัวแก้ว อ.พยัคฆฯ",
+    station_code: "ST0009",
+    province: "มหาสารคาม",
+    amphoe: "พยัคฆภูมิพิสัย",
+    tambon: "หนองบัวแก้ว",
+    lat: 15.5227,
+    lng: 103.343,
     status: "online",
     last_seen: new Date().toISOString(),
   },
 ];
 
+// Real Handy Soil IoT devices snapshot from https://weather-api.arda365days.com/api/public/v1/handy/devices
 export const mockHandyDevices: HandyDevice[] = [
   {
-    id: "HD-SOIL-01",
-    name: "Handy Soil IoT #01 - แปลงข้าวโพดหวาน A1",
-    device_code: "HND-001",
-    location: "แปลงทดสอบกลางแจ้ง แปลง A1",
-    crop_type: "ข้าวโพดหวานไฮบริด",
+    id: "H0003",
+    name: "Handy 3",
+    device_code: "H0003",
+    location: "แปลงตรวจวัดดิน มหาสารคาม",
+    crop_type: "Handy Soil v1",
     status: "online",
     battery: 92,
-    last_seen: new Date().toISOString(),
+    last_seen: "2026-11-03T09:08:17.112Z",
   },
   {
-    id: "HD-SOIL-02",
-    name: "Handy Soil IoT #02 - โรงเรือนเมล่อนปิด Smart Greenhouse B2",
-    device_code: "HND-002",
-    location: "โรงเรือนปิดควบคุมความชื้น B2",
-    crop_type: "เมล่อนญี่ปุ่น คราวน์เมล่อน",
+    id: "H0001",
+    name: "Handy 1",
+    device_code: "H0001",
+    location: "ศูนย์วิจัยคณะวิทยาศาสตร์ มมส.",
+    crop_type: "HS-Pro v2",
     status: "online",
     battery: 88,
-    last_seen: new Date().toISOString(),
+    last_seen: "2026-07-24T07:19:52.951Z",
   },
   {
-    id: "HD-SOIL-03",
-    name: "Handy Soil IoT #03 - สวนทุเรียนหมอนทอง แปลง C3",
-    device_code: "HND-003",
-    location: "สวนผลไม้เชิงลาดเนิน C3",
-    crop_type: "ทุเรียนหมอนทอง 5 ปี",
+    id: "H0002",
+    name: "Handy 2",
+    device_code: "H0002",
+    location: "แปลงนาสาธิต ต.นาสีนวล",
+    crop_type: "Handy Soil v1",
+    status: "online",
+    battery: 85,
+    last_seen: "2026-11-04T06:16:44.810Z",
+  },
+  {
+    id: "H0004",
+    name: "Handy 4",
+    device_code: "H0004",
+    location: "แปลงเกษตรอินทรีย์ อ.บรบือ",
+    crop_type: "Handy Soil v1",
+    status: "online",
+    battery: 90,
+    last_seen: "2026-10-28T08:56:12.117Z",
+  },
+  {
+    id: "H0005",
+    name: "Handy 5",
+    device_code: "H0005",
+    location: "แปลงวิจัยพืชไร่ อ.โกสุมพิสัย",
+    crop_type: "Handy Soil v1",
     status: "online",
     battery: 79,
-    last_seen: new Date().toISOString(),
+    last_seen: "2026-11-02T05:24:33.880Z",
   },
 ];
 
 export function getMockLatestWeather(stationId: string): WeatherData {
-  return {
-    station_id: stationId,
-    temp: 34.2,           // °C
-    humi: 68.5,           // %
-    hic: 39.8,            // °C Heat Index
-    pm25: 28.4,           // µg/m³
-    co2: 418,             // ppm
-    vpd: 1.45,            // kPa
-    lux: 54200,           // lux
-    pressure: 1012.8,     // hPa
-    rain: 2.4,            // mm
-    windDir: 165,         // degrees (SSE)
-    windSpeed: 3.8,       // m/s
-    timestamp: new Date().toISOString(),
+  const now = new Date().toISOString();
+  const presets: Record<string, WeatherData> = {
+    ST0007: {
+      station_id: "ST0007",
+      temp: 26.9,
+      humi: 55.3,
+      hic: 27.65,
+      pm25: 6.0,
+      co2: 500,
+      vpd: 1.58,
+      lux: 20366,
+      pressure: 989,
+      rain: 0.0,
+      windDir: 75,
+      windSpeed: 8.0,
+      timestamp: now,
+    },
+    ST0017: {
+      station_id: "ST0017",
+      temp: 31.4,
+      humi: 62.0,
+      hic: 35.2,
+      pm25: 14.5,
+      co2: 460,
+      vpd: 1.72,
+      lux: 44200,
+      pressure: 1006,
+      rain: 0.4,
+      windDir: 120,
+      windSpeed: 4.5,
+      timestamp: now,
+    },
+    ST0014: {
+      station_id: "ST0014",
+      temp: 29.8,
+      humi: 58.4,
+      hic: 32.1,
+      pm25: 11.2,
+      co2: 485,
+      vpd: 1.65,
+      lux: 38900,
+      pressure: 1004,
+      rain: 0.0,
+      windDir: 95,
+      windSpeed: 5.2,
+      timestamp: now,
+    },
+    ST0010: {
+      station_id: "ST0010",
+      temp: 35.8,
+      humi: 49.5,
+      hic: 40.6,
+      pm25: 39.2,
+      co2: 430,
+      vpd: 2.15,
+      lux: 64500,
+      pressure: 1002,
+      rain: 0.0,
+      windDir: 210,
+      windSpeed: 3.8,
+      timestamp: now,
+    },
   };
+
+  return (
+    presets[stationId] || {
+      ...presets["ST0007"],
+      station_id: stationId || "ST0007",
+    }
+  );
 }
 
 export function getMockLatestSoil(deviceId: string): SoilData {
-  return {
-    device_id: deviceId,
-    nitrogen: 48,          // mg/kg
-    phosphorus: 26,        // mg/kg
-    potassium: 175,        // mg/kg
-    ph: 6.35,              // pH
-    ec: 1.28,              // mS/cm
-    soil_moisture: 38.5,   // %
-    soil_temp: 28.2,       // °C
-    timestamp: new Date().toISOString(),
+  const now = new Date().toISOString();
+  const presets: Record<string, SoilData> = {
+    H0003: {
+      device_id: "H0003",
+      nitrogen: 45,
+      phosphorus: 28,
+      potassium: 165,
+      ph: 6.4,
+      ec: 1.15,
+      soil_moisture: 45.0,
+      soil_temp: 29.0,
+      timestamp: "2026-11-03T09:08:17.143Z",
+    },
+    H0001: {
+      device_id: "H0001",
+      nitrogen: 52,
+      phosphorus: 34,
+      potassium: 190,
+      ph: 6.6,
+      ec: 1.42,
+      soil_moisture: 54.5,
+      soil_temp: 27.8,
+      timestamp: now,
+    },
+    H0002: {
+      device_id: "H0002",
+      nitrogen: 38,
+      phosphorus: 22,
+      potassium: 145,
+      ph: 5.2,
+      ec: 0.95,
+      soil_moisture: 26.5,
+      soil_temp: 30.4,
+      timestamp: now,
+    },
+    H0004: {
+      device_id: "H0004",
+      nitrogen: 48,
+      phosphorus: 30,
+      potassium: 175,
+      ph: 6.8,
+      ec: 1.28,
+      soil_moisture: 49.0,
+      soil_temp: 28.5,
+      timestamp: now,
+    },
+    H0005: {
+      device_id: "H0005",
+      nitrogen: 41,
+      phosphorus: 25,
+      potassium: 158,
+      ph: 6.2,
+      ec: 1.1,
+      soil_moisture: 42.0,
+      soil_temp: 29.2,
+      timestamp: now,
+    },
   };
+
+  return (
+    presets[deviceId] || {
+      ...presets["H0003"],
+      device_id: deviceId || "H0003",
+    }
+  );
 }
 
 export function generateMockWeatherHistory(
   stationId: string,
-  startDateStr: string,
-  endDateStr: string
+  startDate: string,
+  endDate: string
 ): WeatherData[] {
-  const start = new Date(startDateStr);
-  const end = new Date(endDateStr);
-  const results: WeatherData[] = [];
+  const base = getMockLatestWeather(stationId);
+  const start = startDate
+    ? new Date(startDate)
+    : new Date(Date.now() - 7 * 86400000);
+  const end = endDate ? new Date(endDate) : new Date();
 
-  // Calculate day difference
-  const diffTime = Math.abs(end.getTime() - start.getTime());
-  const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-  const pointsCount = Math.min(Math.max(diffDays, 7), 30);
+  const diffDays = Math.max(
+    1,
+    Math.min(
+      60,
+      Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+    )
+  );
 
-  for (let i = 0; i <= pointsCount; i++) {
-    const currentPoint = new Date(start.getTime() + (diffTime / pointsCount) * i);
-    const dayFactor = Math.sin((i / pointsCount) * Math.PI * 2);
-    const noise = (Math.sin(i * 1.7) * 0.5 + 0.5);
+  const history: WeatherData[] = [];
+  for (let i = 0; i < diffDays; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    d.setHours(12, 0, 0, 0);
 
-    const temp = Number((31.5 + dayFactor * 4.5 + noise * 1.5).toFixed(1));
-    const humi = Number((78 - dayFactor * 15 + noise * 5).toFixed(1));
-    const hic = Number((temp + (humi / 100) * 8.5).toFixed(1));
-    const pm25 = Number((22 + Math.abs(Math.sin(i * 0.8)) * 25).toFixed(1));
-    const co2 = Math.round(410 + Math.sin(i * 0.5) * 35);
-    const vpd = Number((1.1 + dayFactor * 0.6).toFixed(2));
-    const lux = Math.round(Math.max(0, 35000 + dayFactor * 28000 + noise * 5000));
-    const pressure = Number((1010 + Math.cos(i * 0.4) * 4).toFixed(1));
-    const rain = i % 5 === 2 ? Number((noise * 16.5).toFixed(1)) : 0;
-    const windSpeed = Number((2.0 + noise * 3.5).toFixed(1));
-    const windDir = Math.round((140 + noise * 90) % 360);
+    const wave = Math.sin(i * 0.9);
+    const cosWave = Math.cos(i * 0.7);
 
-    results.push({
+    const temp = Number((base.temp + wave * 2.4).toFixed(1));
+    const humi = Number(
+      Math.min(98, Math.max(35, base.humi - wave * 8)).toFixed(1)
+    );
+    const rain =
+      i % 3 === 0 ? Number(Math.max(0, 4.2 + cosWave * 6.5).toFixed(1)) : 0;
+    const pm25 = Number(Math.max(5, base.pm25 + cosWave * 6.5).toFixed(1));
+
+    history.push({
+      id: `WH-${stationId}-${i}`,
       station_id: stationId,
       temp,
       humi,
-      hic,
+      hic: Number((temp + (humi > 65 ? 3.8 : 1.9)).toFixed(1)),
       pm25,
-      co2,
-      vpd,
-      lux,
-      pressure,
+      co2: Math.round((base.co2 || 480) + wave * 15),
+      vpd: Number(Math.max(0.4, (base.vpd || 1.4) + wave * 0.25).toFixed(2)),
+      lux: Math.round(Math.max(8500, (base.lux || 25000) + cosWave * 9500)),
+      pressure: Number((base.pressure + cosWave * 2).toFixed(1)),
       rain,
-      windDir,
-      windSpeed,
-      timestamp: currentPoint.toISOString(),
+      windDir: (base.windDir! + i * 25) % 360,
+      windSpeed: Number(
+        Math.max(0.8, base.windSpeed + cosWave * 2.1).toFixed(1)
+      ),
+      timestamp: d.toISOString(),
     });
   }
 
-  return results;
+  return history;
 }
 
 export function generateMockSoilHistory(
   deviceId: string,
-  startDateStr: string,
-  endDateStr: string
+  startDate: string,
+  endDate: string
 ): SoilData[] {
-  const start = new Date(startDateStr);
-  const end = new Date(endDateStr);
-  const results: SoilData[] = [];
+  const base = getMockLatestSoil(deviceId);
+  const start = startDate
+    ? new Date(startDate)
+    : new Date(Date.now() - 7 * 86400000);
+  const end = endDate ? new Date(endDate) : new Date();
 
-  const diffTime = Math.abs(end.getTime() - start.getTime());
-  const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-  const pointsCount = Math.min(Math.max(diffDays, 7), 30);
+  const diffDays = Math.max(
+    1,
+    Math.min(
+      60,
+      Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+    )
+  );
 
-  let currentMoisture = 45.0;
+  const history: SoilData[] = [];
+  for (let i = 0; i < diffDays; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    d.setHours(9, 30, 0, 0);
 
-  for (let i = 0; i <= pointsCount; i++) {
-    const currentPoint = new Date(start.getTime() + (diffTime / pointsCount) * i);
-    const noise = Math.sin(i * 1.3) * 0.5 + 0.5;
+    const wave = Math.sin(i * 0.8);
+    const cosWave = Math.cos(i * 0.6);
 
-    // Simulate moisture dropping naturally, then jumping when irrigated
-    if (i % 6 === 0) {
-      currentMoisture = 62.0; // Irrigated
-    } else {
-      currentMoisture = Math.max(22.0, currentMoisture - (3.5 + noise * 1.5));
-    }
-
-    const nitrogen = Math.round(40 + Math.sin(i * 0.3) * 12 + noise * 5);
-    const phosphorus = Math.round(22 + Math.cos(i * 0.4) * 6 + noise * 3);
-    const potassium = Math.round(160 + Math.sin(i * 0.2) * 25 + noise * 10);
-    const ph = Number((6.3 + Math.sin(i * 0.5) * 0.35).toFixed(2));
-    const ec = Number((1.1 + noise * 0.3).toFixed(2));
-    const soil_temp = Number((26.5 + Math.sin(i * 0.7) * 2.8).toFixed(1));
-
-    results.push({
+    history.push({
+      id: `SH-${deviceId}-${i}`,
       device_id: deviceId,
-      nitrogen,
-      phosphorus,
-      potassium,
-      ph,
-      ec,
-      soil_moisture: Number(currentMoisture.toFixed(1)),
-      soil_temp,
-      timestamp: currentPoint.toISOString(),
+      nitrogen: Math.max(5, Math.round(base.nitrogen + wave * 5)),
+      phosphorus: Math.max(5, Math.round(base.phosphorus + cosWave * 4)),
+      potassium: Math.max(10, Math.round(base.potassium + wave * 12)),
+      ph: Number(Math.max(4.2, Math.min(8.5, base.ph + wave * 0.18)).toFixed(2)),
+      ec: Number(Math.max(0.2, base.ec + cosWave * 0.15).toFixed(2)),
+      soil_moisture: Number(
+        Math.min(92, Math.max(18, base.soil_moisture + cosWave * 9.5)).toFixed(1)
+      ),
+      soil_temp: Number((base.soil_temp + wave * 1.4).toFixed(1)),
+      timestamp: d.toISOString(),
     });
   }
 
-  return results;
+  return history;
 }

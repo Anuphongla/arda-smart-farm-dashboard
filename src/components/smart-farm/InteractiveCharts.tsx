@@ -25,7 +25,7 @@ export function InteractiveCharts({
   soilHistory,
   dateRangeText,
 }: InteractiveChartsProps) {
-  const formatDateLabel = (isoDate: string) => {
+  const formatDateLabel = (isoDate: string, includeTime: boolean = false) => {
     if (!isoDate) return "";
     const d = new Date(isoDate);
     const day = d.getDate().toString().padStart(2, "0");
@@ -43,18 +43,44 @@ export function InteractiveCharts({
       "พ.ย.",
       "ธ.ค.",
     ];
+    if (includeTime) {
+      const hh = d.getHours().toString().padStart(2, "0");
+      const mm = d.getMinutes().toString().padStart(2, "0");
+      return `${day} ${months[d.getMonth()]} ${hh}:${mm}`;
+    }
     return `${day} ${months[d.getMonth()]}`;
   };
 
-  const weatherChartData = weatherHistory.map((item) => ({
-    ...item,
-    formattedDate: formatDateLabel(item.timestamp),
-  }));
+  // Sort chronologically (oldest -> newest) and downsample to max 20 points so 15-min API logs render cleanly
+  const prepareSeries = <T extends { timestamp: string }>(
+    list: T[],
+    maxPoints = 18
+  ) => {
+    const sorted = [...list].sort(
+      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
+    const isHighFreq = sorted.length > 24;
+    if (sorted.length <= maxPoints) {
+      return sorted.map((item) => ({
+        ...item,
+        formattedDate: formatDateLabel(item.timestamp, isHighFreq),
+      }));
+    }
+    const step = (sorted.length - 1) / (maxPoints - 1);
+    const sampled: (T & { formattedDate: string })[] = [];
+    for (let i = 0; i < maxPoints; i++) {
+      const idx = Math.round(i * step);
+      const item = sorted[idx];
+      sampled.push({
+        ...item,
+        formattedDate: formatDateLabel(item.timestamp, isHighFreq),
+      });
+    }
+    return sampled;
+  };
 
-  const soilChartData = soilHistory.map((item) => ({
-    ...item,
-    formattedDate: formatDateLabel(item.timestamp),
-  }));
+  const weatherChartData = prepareSeries(weatherHistory, 18);
+  const soilChartData = prepareSeries(soilHistory, 18);
 
   // Clean Professional Dark Tooltip
   const CustomDarkTooltip = ({ active, payload, label }: any) => {
@@ -64,7 +90,7 @@ export function InteractiveCharts({
           <p className="font-mono text-[11px] text-slate-400 border-b border-slate-800 pb-1 flex items-center justify-between">
             <span className="flex items-center gap-1.5">
               <Calendar className="h-3 w-3 text-sky-400" />
-              <span>วันที่ {label}</span>
+              <span>{label}</span>
             </span>
           </p>
           <div className="space-y-1 pt-0.5">

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { Station, HandyDevice, WeatherData, SoilData } from "@/types/arda";
 import {
+  DEFAULT_ARDA_API_KEY,
   fetchStations,
   fetchLatestWeather,
   fetchWeatherHistory,
@@ -31,9 +32,9 @@ export default function DashboardPage() {
   const { data: session } = useSession();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
-  // API Key & Connection Mode
-  const [apiKey, setApiKey] = useState("");
-  const [isMockMode, setIsMockMode] = useState(true);
+  // API Key & Connection Mode (Initialized with real ARDA API Key)
+  const [apiKey, setApiKey] = useState(DEFAULT_ARDA_API_KEY);
+  const [isMockMode, setIsMockMode] = useState(false);
 
   // Stations & Devices
   const [stations, setStations] = useState<Station[]>([]);
@@ -41,10 +42,10 @@ export default function DashboardPage() {
   const [handyDevices, setHandyDevices] = useState<HandyDevice[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState("");
 
-  // Date Range (default: last 7 days)
+  // Date Range (default: last 14 days to capture both Weather & Handy Soil logs)
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
-    d.setDate(d.getDate() - 7);
+    d.setDate(d.getDate() - 14);
     return d.toISOString().split("T")[0];
   });
   const [endDate, setEndDate] = useState(() => {
@@ -65,14 +66,6 @@ export default function DashboardPage() {
     type: "success" | "warning" | "error";
     text: string;
   } | null>(null);
-
-  // Load API Key from localStorage on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedKey = localStorage.getItem("arda_api_key") || "";
-      setApiKey(savedKey);
-    }
-  }, []);
 
   // Fetch all data function
   const fetchAllData = useCallback(
@@ -99,63 +92,76 @@ export default function DashboardPage() {
         setHandyDevices(deviceList);
 
         const activeStationId =
-          targetStationId || selectedStationId || (stationList[0]?.id ?? "ST-CM01");
+          targetStationId ||
+          selectedStationId ||
+          (stationList[0]?.id ?? "ST0007");
         const activeDeviceId =
-          targetDeviceId || selectedDeviceId || (deviceList[0]?.id ?? "HD-SOIL-01");
+          targetDeviceId ||
+          selectedDeviceId ||
+          (deviceList[0]?.id ?? "H0003");
 
         setSelectedStationId(activeStationId);
         setSelectedDeviceId(activeDeviceId);
 
-        const isUsingMock = stationsRes.isMock || devicesRes.isMock;
-        setIsMockMode(isUsingMock);
-
         // 2. Fetch Latest & History
-        const [wLatestRes, sLatestRes, wHistoryRes, sHistoryRes] = await Promise.all([
-          fetchLatestWeather(activeStationId, currentKey),
-          fetchLatestSoil(activeDeviceId, currentKey),
-          fetchWeatherHistory(activeStationId, sDate, eDate, currentKey),
-          fetchSoilHistory(activeDeviceId, sDate, eDate, currentKey),
-        ]);
+        const [wLatestRes, sLatestRes, wHistoryRes, sHistoryRes] =
+          await Promise.all([
+            fetchLatestWeather(activeStationId, currentKey),
+            fetchLatestSoil(activeDeviceId, currentKey),
+            fetchWeatherHistory(activeStationId, sDate, eDate, currentKey),
+            fetchSoilHistory(activeDeviceId, sDate, eDate, currentKey),
+          ]);
 
         setLatestWeather(wLatestRes.data);
         setLatestSoil(sLatestRes.data);
         setWeatherHistory(wHistoryRes.data);
         setSoilHistory(sHistoryRes.data);
 
-        if (wLatestRes.isMock || sLatestRes.isMock) {
+        const isUsingMock =
+          stationsRes.isMock ||
+          devicesRes.isMock ||
+          wLatestRes.isMock ||
+          sLatestRes.isMock;
+
+        if (isUsingMock) {
           setIsMockMode(true);
           if (currentKey && currentKey !== "demo") {
             setStatusMessage({
               type: "warning",
-              text: "API Key ที่ระบุไม่ผ่านการตรวจสอบ (401) ระบบสลับมาแสดงชุดข้อมูลจำลองสถานีเกษตรอัตโนมัติ",
+              text: "API Key ที่ระบุไม่ผ่านการตรวจสอบ (401) ระบบกำลังแสดงชุดข้อมูลสำรองเพื่อความต่อเนื่อง",
             });
           } else {
             setStatusMessage({
               type: "warning",
-              text: "กำลังแสดงชุดข้อมูลจำลองเสมือนจริงจากสถานีวิจัยเกษตรหลวงเชียงใหม่ & สุพรรณบุรี (สามารถกดใส่ x-api-key เพื่อดึงข้อมูลจริงได้ทันที)",
+              text: "กำลังใช้งานโหมดจำลอง (Demo Mode) สามารถกดปุ่ม 'ตั้งค่า API Key' เพื่อเชื่อมต่อเซิร์ฟเวอร์จริงได้ทันที",
             });
           }
         } else {
           setIsMockMode(false);
           setStatusMessage({
             type: "success",
-            text: "เชื่อมต่อกับเซิร์ฟเวอร์ ARDA API สำเร็จ! กำลังแสดงข้อมูลตรวจวัดสดจากสถานีจริง",
+            text: `เชื่อมต่อเซิร์ฟเวอร์ ARDA API สดสำเร็จ! (สถานี ${activeStationId} • อุปกรณ์วัดดิน ${activeDeviceId})`,
           });
         }
 
         const now = new Date();
         setLastUpdated(
-          `${now.toLocaleDateString("th-TH")} ${now.toLocaleTimeString("th-TH", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          })} น.`
+          `${now.toLocaleDateString("th-TH")} ${now.toLocaleTimeString(
+            "th-TH",
+            {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            }
+          )} น.`
         );
       } catch (err: any) {
         setIsMockMode(true);
         setStatusMessage({
           type: "error",
-          text: `เกิดข้อผิดพลาดในการเชื่อมต่อ: ${err?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"}`,
+          text: `เกิดข้อผิดพลาดในการเชื่อมต่อ: ${
+            err?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+          }`,
         });
       } finally {
         setIsLoading(false);
@@ -165,9 +171,15 @@ export default function DashboardPage() {
     [selectedStationId, selectedDeviceId, startDate, endDate]
   );
 
-  // Initial fetch on mount
+  // Initial fetch on mount using saved key or DEFAULT_ARDA_API_KEY
   useEffect(() => {
-    fetchAllData(apiKey);
+    const savedKey =
+      typeof window !== "undefined"
+        ? localStorage.getItem("arda_api_key")
+        : null;
+    const initialKey = savedKey || DEFAULT_ARDA_API_KEY;
+    setApiKey(initialKey);
+    fetchAllData(initialKey);
   }, []);
 
   const handleSelectStation = (newStationId: string) => {
@@ -222,10 +234,14 @@ export default function DashboardPage() {
               <div className="hidden lg:flex items-center gap-2 rounded-xl border border-sky-100 bg-sky-50/60 px-3 py-1.5 text-xs">
                 <CloudSun className="h-3.5 w-3.5 text-sky-600" />
                 <span className="text-slate-500">สถานี:</span>
-                <span className="font-mono font-bold text-sky-800">{selectedStationId}</span>
+                <span className="font-mono font-bold text-sky-800">
+                  {selectedStationId}
+                </span>
                 <span className="text-slate-300">|</span>
                 <span className="text-slate-500">เซนเซอร์:</span>
-                <span className="font-mono font-bold text-emerald-800">{selectedDeviceId}</span>
+                <span className="font-mono font-bold text-emerald-800">
+                  {selectedDeviceId}
+                </span>
               </div>
             )}
 
@@ -244,7 +260,9 @@ export default function DashboardPage() {
                   />
                 ) : (
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-tr from-sky-500 to-teal-500 text-white font-bold text-xs shadow-2xs">
-                    {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "U"}
+                    {session?.user?.name
+                      ? session.user.name.charAt(0).toUpperCase()
+                      : "U"}
                   </div>
                 )}
                 <div className="hidden sm:block text-left">
@@ -267,7 +285,7 @@ export default function DashboardPage() {
                 />
               )}
 
-              {/* Profile Dropdown Menu (Guaranteed not to overflow viewport) */}
+              {/* Profile Dropdown Menu */}
               {showProfileMenu && (
                 <div className="absolute right-0 mt-2 w-56 max-w-[calc(100vw-24px)] rounded-2xl border border-sky-100 bg-white p-1.5 shadow-xl z-50 animate-in fade-in slide-in-from-top-1">
                   <div className="border-b border-slate-100 px-3 py-2 text-xs">
@@ -311,12 +329,16 @@ export default function DashboardPage() {
             ) : (
               <AlertCircle
                 className={`h-4 w-4 shrink-0 mt-0.5 ${
-                  statusMessage.type === "warning" ? "text-sky-600" : "text-rose-600"
+                  statusMessage.type === "warning"
+                    ? "text-sky-600"
+                    : "text-rose-600"
                 }`}
               />
             )}
             <div className="flex-1 min-w-0">
-              <p className="font-medium leading-relaxed">{statusMessage.text}</p>
+              <p className="font-medium leading-relaxed">
+                {statusMessage.text}
+              </p>
             </div>
           </div>
         )}
@@ -337,12 +359,19 @@ export default function DashboardPage() {
           onRefresh={handleRefresh}
           apiKey={apiKey}
           onSaveApiKey={(key) => {
-            setApiKey(key);
+            const nextKey = key || "demo";
+            setApiKey(nextKey);
             if (typeof window !== "undefined") {
               if (key) localStorage.setItem("arda_api_key", key);
-              else localStorage.removeItem("arda_api_key");
+              else localStorage.setItem("arda_api_key", "demo");
             }
-            fetchAllData(key, selectedStationId, selectedDeviceId, startDate, endDate);
+            fetchAllData(
+              nextKey,
+              selectedStationId,
+              selectedDeviceId,
+              startDate,
+              endDate
+            );
           }}
           isMockMode={isMockMode}
         />
@@ -389,7 +418,8 @@ export default function DashboardPage() {
       {/* Footer */}
       <footer className="mt-8 border-t border-sky-100 bg-white/80 py-4 text-center text-xs text-slate-400">
         <p>
-          ARDA SmartFarm & Weather Telemetry Dashboard • Powered by ARDA Open API (arda365days.com)
+          ARDA SmartFarm & Weather Telemetry Dashboard • Powered by ARDA Open
+          API (arda365days.com)
         </p>
       </footer>
     </div>
